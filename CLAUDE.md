@@ -19,6 +19,7 @@ https://biotime.st-andrews.ac.uk/
 - Later notebooks load the saved marine `.rds` files rather than the full raw data.
 - Quarto isn't on the shell PATH; render with
   `/Applications/RStudio.app/Contents/Resources/app/quarto/bin/quarto render <file>.qmd`
+- Git repo at `time_series/` (branch `main`, no remote). `data/`, rendered HTML and RStudio files are gitignored.
 - BioTIMEr (CRAN, not installed yet) – use for gridding, rarefaction, alpha/beta metrics.
 
 ## Log
@@ -30,6 +31,7 @@ key results and decisions made, and update "Next steps".
 - Created R project and `01_import_marine.qmd`: import full BioTIME, filter `REALM == "Marine"`.
 - Result: 229 marine studies, ~5.2M rows. Taxa: 118 invertebrates, 67 fish, 18 multiple,
   12 plants, 11 birds, 3 mammals. Study duration median 10 yr (range 2–130).
+- Added CLAUDE.md and set up git.
 
 ## Next steps / open questions
 
