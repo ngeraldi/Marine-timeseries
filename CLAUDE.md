@@ -19,7 +19,7 @@ https://biotime.st-andrews.ac.uk/
 - Later notebooks load the saved marine `.rds` files rather than the full raw data.
 - Quarto isn't on the shell PATH; render with
   `/Applications/RStudio.app/Contents/Resources/app/quarto/bin/quarto render <file>.qmd`
-- Git repo at `time_series/` (branch `main`, no remote). `data/`, rendered HTML and RStudio files are gitignored.
+- Git repo at `time_series/` (branch `main`, remote `origin` = github.com/ngeraldi/Marine-timeseries, public). `data/`, rendered HTML and RStudio files are gitignored.
 - BioTIMEr (CRAN, not installed yet) – use for gridding, rarefaction, alpha/beta metrics.
 
 ## Log
