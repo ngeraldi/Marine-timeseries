@@ -1,0 +1,110 @@
+---
+title: "BioTIME marine time series: import and filter"
+author: "Nathan Geraldi"
+date: today
+format:
+  html:
+    toc: true
+    code-fold: false
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+## Overview
+
+Import the full BioTIME v2 (2025) download and keep only studies whose
+`REALM` is `"Marine"`.
+
+- Metadata: one row per study (`STUDY_ID`), includes `REALM`, `TAXA`, `HABITAT`, etc.
+- Raw data: one row per species × sample (~12 M rows), linked to metadata by `STUDY_ID`.
+
+The [BioTIMEr](https://cran.r-project.org/package=BioTIMEr) package is not
+needed for importing (the download is already an `.rds`), but it is useful
+later for gridding studies (`gridding()`), rarefying samples
+(`resampling()`), and computing diversity/turnover metrics (`getAlphaMetrics()`,
+`getBetaMetrics()`). Install once with `install.packages("BioTIMEr")`.
+
+## Setup
+
+```{r}
+#| label: setup
+library(dplyr)
+library(ggplot2)
+
+data_dir <- file.path("..", "data", "biotime")
+```
+
+## Import
+
+```{r}
+#| label: import
+meta <- read.csv(file.path(data_dir, "biotime_v2_metadata_2025(1).csv"))
+raw  <- readRDS(file.path(data_dir, "biotime_v2_rawdata_2025.rds"))
+
+dim(meta)
+dim(raw)
+```
+
+```{r}
+#| label: realm-counts
+count(meta, REALM)
+```
+
+## Filter to marine
+
+```{r}
+#| label: filter-marine
+meta_marine <- meta |>
+  filter(REALM == "Marine")
+
+raw_marine <- raw |>
+  filter(STUDY_ID %in% meta_marine$STUDY_ID)
+
+# check every marine study has raw data
+setdiff(meta_marine$STUDY_ID, unique(raw_marine$STUDY_ID))
+
+n_distinct(raw_marine$STUDY_ID)
+nrow(raw_marine)
+
+rm(raw); gc()
+```
+
+## Quick look at the marine subset
+
+```{r}
+#| label: marine-summary
+meta_marine |>
+  count(TAXA, sort = TRUE)
+
+meta_marine |>
+  count(CLIMATE, sort = TRUE)
+
+summary(meta_marine$END_YEAR - meta_marine$START_YEAR + 1)
+```
+
+```{r}
+#| label: marine-map
+#| fig-width: 9
+#| fig-height: 5
+world <- map_data("world")
+
+ggplot() +
+  geom_polygon(data = world, aes(long, lat, group = group),
+               fill = "grey85", colour = NA) +
+  geom_point(data = meta_marine,
+             aes(CENT_LONG, CENT_LAT, colour = TAXA, size = DATA_POINTS),
+             alpha = 0.7) +
+  coord_quickmap() +
+  labs(x = NULL, y = NULL, size = "Years sampled", colour = "Taxa") +
+  theme_minimal()
+```
+
+## Save marine subset
+
+```{r}
+#| label: save
+saveRDS(meta_marine, file.path(data_dir, "biotime_marine_metadata.rds"))
+saveRDS(raw_marine,  file.path(data_dir, "biotime_marine_rawdata.rds"))
+```
